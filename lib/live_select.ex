@@ -148,23 +148,23 @@ defmodule LiveSelect do
   _Template:_
   ```
   <.form for={@form} phx-change="change">
-    <.live_select field={@form[:city_search]} /> 
+    <.live_select field={@form[:city_search]} />
   </.form>
   ```
-    
+
   > #### Forms implemented in LiveComponents {: .warning}
-  > 
+  >
   > If your form is implemented in a LiveComponent and not in a LiveView, you have to add the `phx-target` attribute
   > when rendering LiveSelect:
   >
   > ```elixir
   >  <.live_select field={@form[:city_search]} phx-target={@myself} />
-  > ```  
-    
+  > ```
+
   _LiveView or LiveComponent that is the target of the form's events:_
   ```
   @impl true
-  def handle_event("live_select_change", %{"text" => text, "id" => live_select_id}, socket) do 
+  def handle_event("live_select_change", %{"text" => text, "id" => live_select_id}, socket) do
       cities = City.search(text)
       # cities could be:
       # [ {"city name 1", [lat_1, long_1]}, {"city name 2", [lat_2, long_2]}, ... ]
@@ -173,13 +173,13 @@ defmodule LiveSelect do
       # [ "city name 1", "city name 2", ... ]
       #
       # or:
-      # [ [label: "city name 1", value: [lat_1, long_1]], [label: "city name 2", value: [lat_2, long_2]], ... ] 
+      # [ [label: "city name 1", value: [lat_1, long_1]], [label: "city name 2", value: [lat_2, long_2]], ... ]
       #
       # or even:
       # ["city name 1": [lat_1, long_1], "city name 2": [lat_2, long_2]]
 
       send_update(LiveSelect.Component, id: live_select_id, options: cities)
-    
+
       {:noreply, socket}
   end
 
@@ -192,7 +192,7 @@ defmodule LiveSelect do
       IO.puts("You selected city #{city_name} located at: #{city_coords}")
 
       {:noreply, socket}
-  end  
+  end
   ```
 
   ### Tags mode
@@ -203,7 +203,7 @@ defmodule LiveSelect do
   _Template:_
   ```
   <.form for={@form} phx-change="change">
-    <.live_select field={@form[:city_search]} mode={:tags} /> 
+    <.live_select field={@form[:city_search]} mode={:tags} />
   </.form>
   ```
 
@@ -216,17 +216,17 @@ defmodule LiveSelect do
       socket
     ) do
     # list_of_coords will contain the list of the JSON-encoded coordinates of the selected cities, for example:
-    # ["[-46.565,-23.69389]", "[-48.27722,-18.91861]"]    
+    # ["[-46.565,-23.69389]", "[-48.27722,-18.91861]"]
 
     IO.puts("You selected cities located at: #{list_of_coords}")
 
     {:noreply, socket}
-  end  
+  end
   ```
 
-  ### Multiple LiveSelect inputs in the same LiveView  
+  ### Multiple LiveSelect inputs in the same LiveView
 
-  If you have multiple LiveSelect inputs in the same LiveView, you can distinguish them based on the field id. 
+  If you have multiple LiveSelect inputs in the same LiveView, you can distinguish them based on the field id.
   For example:
 
   _Template:_
@@ -255,10 +255,10 @@ defmodule LiveSelect do
 
   ## Using LiveSelect with associations and embeds
 
-  LiveSelect can also be used to display and select associations or embeds without too much effort. 
-  Let's say you have the following schemas:  
-    
-  ```  
+  LiveSelect can also be used to display and select associations or embeds without too much effort.
+  Let's say you have the following schemas:
+
+  ```
   defmodule City do
     @moduledoc false
 
@@ -292,7 +292,7 @@ defmodule LiveSelect do
     end
   end
   ```
-    
+
   Each city has a name and an array with coordinates - we want `LiveSelect` to display the name as label in the dropdown and in the tags, but we want
   the entire data structure (name + coordinates) to be sent to the server when the user selects.
 
@@ -329,20 +329,20 @@ defmodule LiveSelect do
     {:noreply, socket}
   end
   ```
-    
+
   > #### IMPORTANT: the output of the `value_mapper/1` function should be JSON-encodable {: .warning}
 
-  Finally, in order to take care of (2) you need to decode the JSON-encoded list of options that's coming from the client before you can 
+  Finally, in order to take care of (2) you need to decode the JSON-encoded list of options that's coming from the client before you can
   cast them to create a changeset. To do so, `LiveSelect` offers a convenience function called `LiveSelect.decode/1`:
   ```
   def handle_event("change", params, socket) do
-    # decode will JSON-decode the value in city_search, handling the type of selection 
+    # decode will JSON-decode the value in city_search, handling the type of selection
     # and taking care of special values such as "" and nil
     params = update_in(params, ~w(city_search_form city_search), &LiveSelect.decode/1)
-    
+
     # now we can cast the params:
     changeset = CitySearchForm.changeset(params)
-    
+
     {:noreply, assign(socket, form: to_form(changeset))}
   end
   ```
@@ -352,12 +352,12 @@ defmodule LiveSelect do
 
   @doc ~S"""
   Renders a `LiveSelect` input in a form.
-    
+
   [INSERT LVATTRDOCS]
 
   ## Styling attributes
 
-  * See [the styling section](styling.md) for details 
+  * See [the styling section](styling.md) for details
   """
   @doc type: :component
 
@@ -378,7 +378,7 @@ defmodule LiveSelect do
     doc:
       ~s(initial available options to select from. Note that, after the initial rendering of the component, options can only be updated using `Phoenix.LiveView.send_update/3` - See the "Options" section for details)
 
-  attr :value, :any, doc: "used to manually set a selection - overrides any values from the form. 
+  attr :value, :any, doc: "used to manually set a selection - overrides any values from the form.
   Must be a single element in `:single` mode, or a list of elements in `:tags` mode."
 
   attr :max_selectable, :integer,
@@ -425,6 +425,11 @@ defmodule LiveSelect do
   slot(:tag, doc: "optional slot that renders a tag. The option's data is available via `:let`")
 
   slot(:clear_button, doc: "optional slot to render a custom clear button")
+
+  slot(:user_defined_text,
+    default: Component.default_opts()[:user_defined_text],
+    doc: "optional slot to render custom text for user defined options"
+  )
 
   attr :"phx-target", :any,
     doc: "Optional target for events. Usually the same target as the form's"
@@ -479,27 +484,27 @@ defmodule LiveSelect do
 
   @doc ~S"""
   Decodes the selection from the client. This has to be used when the values in the selection aren't simple integers or strings.
-    
-  Let's say you receive your params in the variable `params`, and your `LiveSelect` field is called `my_field` and belongs to the form `my_form`. Then you should  
+
+  Let's say you receive your params in the variable `params`, and your `LiveSelect` field is called `my_field` and belongs to the form `my_form`. Then you should
   decode like this:
 
   ```
   params = update_in(params, ~w(my_form my_field), &LiveSelect.decode/1)
   ```
-    
-  ## Examples:  
+
+  ## Examples:
 
     iex> decode(nil)
     []
-        
+
     iex> decode("")
     nil
-      
+
     iex> decode("{\"name\":\"Berlin\",\"pos\":[13.41053,52.52437]}")
     %{"name" => "Berlin","pos" => [13.41053,52.52437]}
-      
+
     iex> decode(["{\"name\":\"New York City\",\"pos\":[-74.00597,40.71427]}","{\"name\":\"Stockholm\",\"pos\":[18.06871,59.32938]}"])
-    [%{"name" => "New York City","pos" => [-74.00597,40.71427]}, %{"name" => "Stockholm","pos" => [18.06871,59.32938]}] 
+    [%{"name" => "New York City","pos" => [-74.00597,40.71427]}, %{"name" => "Stockholm","pos" => [18.06871,59.32938]}]
   """
   def decode(selection) do
     case selection do

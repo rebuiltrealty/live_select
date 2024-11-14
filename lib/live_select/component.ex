@@ -19,6 +19,7 @@ defmodule LiveSelect.Component do
     clear_tag_button_class: nil,
     clear_tag_button_extra_class: nil,
     user_defined_options: false,
+    user_defined_text: "Click to select",
     container_class: nil,
     container_extra_class: nil,
     debounce: 100,
@@ -40,6 +41,7 @@ defmodule LiveSelect.Component do
     text_input_class: nil,
     text_input_extra_class: nil,
     text_input_selected_class: nil,
+    user_defined_button_extra_class: nil,
     update_min_len: 1,
     value: nil
   ]
@@ -54,6 +56,7 @@ defmodule LiveSelect.Component do
       dropdown: ~W(absolute rounded-md shadow z-50 bg-gray-100 inset-x-0 top-full),
       option: ~W(rounded px-4 py-1),
       selected_option: ~W(text-gray-400),
+      user_defined_button: ~W(bg-gray-100 text-left italic),
       text_input:
         ~W(rounded-md w-full disabled:bg-gray-100 disabled:placeholder:text-gray-400 disabled:text-gray-400 pr-6),
       text_input_selected: ~W(border-gray-600 text-gray-600),
@@ -85,6 +88,7 @@ defmodule LiveSelect.Component do
     socket =
       socket
       |> assign(
+        current_text: nil,
         active_option: -1,
         hide_dropdown: true,
         awaiting_update: true,
@@ -183,16 +187,23 @@ defmodule LiveSelect.Component do
   end
 
   @impl true
-  def handle_event("blur", _params, socket) do
+  def handle_event("tag_selected", _params, socket) do
+    socket = socket |> assign(active_option: -1) |> maybe_select()
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("click_away", _params, socket) do
     socket =
-      maybe_restore_selection(socket)
+      socket
+      |> maybe_restore_selection()
       |> assign(:hide_dropdown, true)
       |> client_select(%{parent_event: socket.assigns[:"phx-blur"]})
 
     {:noreply, socket}
   end
 
-  @impl true
   def handle_event(event, _params, socket) when event in ~w(focus click) do
     socket =
       socket
@@ -391,7 +402,8 @@ defmodule LiveSelect.Component do
        when max_selectable > 0 and length(selection) >= max_selectable do
     assign(socket,
       active_option: -1,
-      hide_dropdown: true
+      hide_dropdown: true,
+      current_text: nil
     )
   end
 
@@ -412,7 +424,7 @@ defmodule LiveSelect.Component do
     if already_selected?(option, socket.assigns.selection) do
       socket
     else
-      select(socket, option, extra_params)
+      socket |> select(option, extra_params) |> assign(current_text: nil)
     end
   end
 
@@ -447,7 +459,8 @@ defmodule LiveSelect.Component do
     |> assign(
       active_option: -1,
       selection: selection,
-      hide_dropdown: true
+      hide_dropdown: true,
+      current_text: nil
     )
     |> maybe_save_selection()
     |> client_select(Map.merge(%{input_event: true}, extra_params))
@@ -461,7 +474,7 @@ defmodule LiveSelect.Component do
         update(socket, :selection, &List.delete_at(&1, pos))
       end
 
-    client_select(socket, %{input_event: true})
+    socket |> client_select(%{input_event: true}) |> assign(current_text: nil)
   end
 
   defp maybe_save_selection(socket) do

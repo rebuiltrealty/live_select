@@ -59,7 +59,7 @@
       autocomplete: "off",
       phx_focus: "focus",
       phx_click: "click",
-      phx_blur: "blur",
+      phx_click_away: "click_away",
       value: label(@mode, @selection)
     ) %>
     <%= if @mode == :single && @allow_clear && Enum.any?(@selection) do %>
@@ -104,6 +104,24 @@
       />
     <% end %>
   <% end %>
+
+  <%= if @current_text != nil and @current_text != "" and @user_defined_options && not @hide_dropdown do %>
+    <button
+      type="button"
+      phx-click="tag_selected"
+      phx-target={@myself}
+      class={
+        class(@style, :text_input, @text_input_class, @text_input_extra_class) ++
+          class(@style, :available_option, @available_option_class) ++
+          class(@style, :user_defined_button, @user_defined_button_extra_class) ++ ~W(z-50)
+      }
+    >
+      <div class={class(@style, :option, @option_class, @option_extra_class)}>
+        <%= render_slot(@user_defined_text, @current_text) %>
+      </div>
+    </button>
+  <% end %>
+
   <%= if Enum.any?(@options) && !@hide_dropdown do %>
     <ul class={class(@style, :dropdown, @dropdown_class, @dropdown_extra_class)}>
       <%= for {option, idx} <- Enum.with_index(@options) do %>
