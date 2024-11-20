@@ -6,12 +6,12 @@ defmodule LiveSelect do
   @moduledoc ~S"""
   The `LiveSelect` component is rendered by calling the `live_select/1` function and passing it a form field.
   LiveSelect creates a text input field in which the user can type text, and hidden input field(s) that will contain the value of the selected option(s).
-    
+
   Whenever the user types something in the text input, LiveSelect triggers a `live_select_change` event for your LiveView or LiveComponent.
-  The message has a `text` parameter containing the current text entered by the user, as well as `id` and `field` parameters with the id of the 
+  The message has a `text` parameter containing the current text entered by the user, as well as `id` and `field` parameters with the id of the
   LiveSelect component and the name of the LiveSelect form field, respectively.
   Your job is to handle the event, retrieve the list of selectable options and then call `Phoenix.LiveView.send_update/3`
-  to send the list of options to LiveSelect. See the "Examples" section below for details, and check out the 
+  to send the list of options to LiveSelect. See the "Examples" section below for details, and check out the
   [cheatsheet](https://hexdocs.pm/live_select/cheatsheet.html) for some useful tips.
 
   Selection can happen either using the keyboard, by navigating the options with the arrow keys and then pressing enter, or by
@@ -23,12 +23,12 @@ defmodule LiveSelect do
   In single mode, if the configuration option `allow_clear` is set, the user can manually clear the selection by clicking on the `x` button on the input field.
   In tags mode, single tags can be removed by clicking on them.
 
-  ## Single mode  
+  ## Single mode
 
   <img alt="demo" src="https://raw.githubusercontent.com/maxmarcon/live_select/main/priv/static/images/demo_single.gif" width="300" />
 
   ## Tags mode
-    
+
   <img alt="demo" src="https://raw.githubusercontent.com/maxmarcon/live_select/main/priv/static/images/demo_tags.gif" width="300" />
 
   When `:tags` mode is enabled `LiveSelect` allows the user to select multiple entries. The entries will be visible above the text input field as removable tags.
@@ -46,7 +46,7 @@ defmodule LiveSelect do
 
   * _atoms, strings or numbers_: In this case, each element will be both label and value for the option
   * _tuples_: `{label, value}` corresponding to label and value for the option
-  * _maps_: `%{label: label, value: value}` or `%{value: value}` 
+  * _maps_: `%{label: label, value: value}` or `%{value: value}`
   * _keywords_: `[label: label, value: value]` or `[value: value]`
 
   In the case of maps and keywords, if only `value` is specified, it will be used as both value and label for the option.
@@ -61,23 +61,23 @@ defmodule LiveSelect do
 
   Note that the option values, if they are not strings, will be JSON-encoded. Your LiveView will receive this JSON-encoded version in the `phx-change` and `phx-submit` events.
 
-  ## Styling 
-    
+  ## Styling
+
   `LiveSelect` supports 3 styling modes:
 
   * `tailwind`: uses standard tailwind utility classes (the default)
   * `daisyui`: uses [daisyUI](https://daisyui.com/) classes.
   * `none`: no styling at all.
 
-  Please see [the styling section](styling.md) for details 
+  Please see [the styling section](styling.md) for details
 
   ## Alternative tag labels
-    
-  Sometimes, in `:tags` mode, you might want to use alternative labels for the tags. For example, you might want the labels in the tags to be shorter 
+
+  Sometimes, in `:tags` mode, you might want to use alternative labels for the tags. For example, you might want the labels in the tags to be shorter
   in order to save space. You can do this by specifying an additional `tag_label` key when passing options as map or keywords. For example, passing these options:
 
   ```
-  [%{label: "New York", value: "NY", tag_label: "NY"}, %{label: "Barcelona", value: "BCN", tag_label: "BCN"}]  
+  [%{label: "New York", value: "NY", tag_label: "NY"}, %{label: "Barcelona", value: "BCN", tag_label: "BCN"}]
   ```
 
   will result in "New York" and "Barcelona" being used for the options in the dropdown, while "NY" and "BCN" will be used for the tags (and the values).
@@ -93,11 +93,11 @@ defmodule LiveSelect do
   Now, whenever the selection contains "New York", the option will stick and the user won't be able to remove it.
 
   ## Slots
-    
+
   You can control how your options and tags are rendered by using the `:option` and `:tag` slots.
   Let's say you want to show some fancy icons next to each option in the dropdown and the tags:
 
-  ```elixir  
+  ```elixir
   <.live_select
           field={@form[:city_search]}
           phx-target={@myself}
@@ -115,7 +115,7 @@ defmodule LiveSelect do
   ```
 
   Here's the result:
-      
+
   <img alt="slots" src="https://raw.githubusercontent.com/maxmarcon/live_select/main/priv/static/images/slots.png" width="200" />
 
   ## Controlling the selection programmatically
@@ -127,8 +127,8 @@ defmodule LiveSelect do
   send_update(LiveSelect.Component, id: live_select_id, value: new_selection)
   ```
 
-  `new_selection` must be a single element in `:single` mode, a list in `:tags` mode. If it's `nil`, the selection will be cleared.  
-  After updating the selection, `LiveSelect` will trigger a change event in the form.  
+  `new_selection` must be a single element in `:single` mode, a list in `:tags` mode. If it's `nil`, the selection will be cleared.
+  After updating the selection, `LiveSelect` will trigger a change event in the form.
 
   To set a custom id for the component to use with `Phoenix.LiveView.send_update/3`, you can pass the `id` assign to `live_select/1`.
 
@@ -430,6 +430,10 @@ defmodule LiveSelect do
     default: Component.default_opts()[:user_defined_text],
     doc: "optional slot to render custom text for user defined options"
   )
+
+  slot :user_header_text,
+    default: Component.default_opts()[:user_header_text],
+    doc: "optional slot to render custom header text for user defined options"
 
   attr :"phx-target", :any,
     doc: "Optional target for events. Usually the same target as the form's"

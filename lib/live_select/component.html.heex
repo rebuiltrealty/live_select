@@ -123,6 +123,10 @@
   <% end %>
 
   <%= if Enum.any?(@options) && !@hide_dropdown do %>
+    <div class={class(@style, :user_defined_button, @user_defined_button_extra_class)}>
+      <%= render_slot(@user_header_text) %>
+    </div>
+
     <ul class={class(@style, :dropdown, @dropdown_class, @dropdown_extra_class)}>
       <%= for {option, idx} <- Enum.with_index(@options) do %>
         <li class={
