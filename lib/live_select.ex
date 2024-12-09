@@ -427,12 +427,14 @@ defmodule LiveSelect do
   slot(:clear_button, doc: "optional slot to render a custom clear button")
 
   slot(:user_defined_text,
-    default: Component.default_opts()[:user_defined_text],
+    # default: Component.default_opts()[:user_defined_text],
+    required: false,
     doc: "optional slot to render custom text for user defined options"
   )
 
   slot :user_header_text,
-    default: Component.default_opts()[:user_header_text],
+    # default: Component.default_opts()[:user_header_text],
+    required: faslse,
     doc: "optional slot to render custom header text for user defined options"
 
   attr :"phx-target", :any,
