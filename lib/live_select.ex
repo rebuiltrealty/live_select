@@ -434,7 +434,7 @@ defmodule LiveSelect do
 
   slot :user_header_text,
     # default: Component.default_opts()[:user_header_text],
-    required: faslse,
+    required: false,
     doc: "optional slot to render custom header text for user defined options"
 
   attr :"phx-target", :any,
