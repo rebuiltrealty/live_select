@@ -19,7 +19,7 @@ defmodule LiveSelect.Component do
     clear_tag_button_class: nil,
     clear_tag_button_extra_class: nil,
     user_defined_options: false,
-    user_defined_text: "Click to select",
+    user_defined_text: nil,
     user_header_text: nil,
     container_class: nil,
     container_extra_class: nil,
